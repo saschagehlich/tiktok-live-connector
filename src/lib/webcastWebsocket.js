@@ -1,8 +1,10 @@
 const Config = require('./webcastConfig.js');
 const websocket = require('websocket');
+const WebcastDeserializer = require('./webcastDeserializer.js');
 const { deserializeWebsocketMessage, serializeMessage } = require('./webcastProtobuf.js');
 
 class WebcastWebsocket extends websocket.client {
+    #webcastDeserializer;
     constructor(wsUrl, cookieJar, clientParams, wsParams, customHeaders, websocketOptions) {
         super();
         this.pingInterval = null;
@@ -13,6 +15,10 @@ class WebcastWebsocket extends websocket.client {
             Cookie: cookieJar.getCookieString(),
             ...(customHeaders || {}),
         };
+
+        this.#webcastDeserializer = new WebcastDeserializer();
+        this.#webcastDeserializer.on('*', (event, msg) => this.emit(event, msg));
+        this.#webcastDeserializer.on('ack', (id) => this.#sendAck(id));
 
         this.#handleEvents();
         this.connect(this.wsUrlWithParams, '', Config.TIKTOK_URL_WEB, this.wsHeaders, websocketOptions);
@@ -41,27 +47,7 @@ class WebcastWebsocket extends websocket.client {
 
     async #handleMessage(message, isFedManally = false) {
         if (!isFedManally) this.emit('rawRawData', message.binaryData);
-        try {
-            let decodedContainer = await deserializeWebsocketMessage(message.binaryData);
-
-            if (decodedContainer.id > 0) {
-                this.#sendAck(decodedContainer.id);
-            }
-
-            if (decodedContainer.type === 'hb') {
-                this.emit('heartbeat');
-            }
-
-            // Emit 'WebcastResponse' from ws message container if decoding success
-            if (typeof decodedContainer.webcastResponse === 'object') {
-                if (decodedContainer.webcastResponse.heartbeatDuration) {
-                    this.emit('heartbeatDuration', decodedContainer.webcastResponse.heartbeatDuration);
-                }
-                this.emit('webcastResponse', decodedContainer.webcastResponse);
-            }
-        } catch (err) {
-            this.emit('messageDecodingFailed', err);
-        }
+        this.#webcastDeserializer.process(message.binaryData);
     }
 
     #sendPing() {

@@ -1,1 +1,1 @@
-{"version":3,"file":"webcastWebsocket.d.ts","sourceRoot":"","sources":["../../src/lib/webcastWebsocket.js"],"names":[],"mappings":";AAIA;IACI,qHAaC;IAXG,6BAAwB;IACxB,gBAAsB;IACtB,cAAgD;IAChD,wBAAuE;IACvE,eAGC;IAML,4BAEC;;CAqDJ"}
+{"version":3,"file":"webcastWebsocket.d.ts","sourceRoot":"","sources":["../../src/lib/webcastWebsocket.js"],"names":[],"mappings":";AAKA;IAEI,qHAiBC;IAfG,6BAAwB;IACxB,gBAAsB;IACtB,cAAgD;IAChD,wBAAuE;IACvE,eAGC;IAUL,4BAEC;;CAiCJ"}

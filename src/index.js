@@ -2,6 +2,7 @@ const { EventEmitter } = require('node:events');
 
 const TikTokHttpClient = require('./lib/tiktokHttpClient.js');
 const WebcastWebsocket = require('./lib/webcastWebsocket.js');
+const WebcastDeserializer = require('./lib/webcastDeserializer.js');
 const { getRoomIdFromMainPageHtml, validateAndNormalizeUniqueId, addUniqueId, removeUniqueId } = require('./lib/tiktokUtils.js');
 const { simplifyObject } = require('./lib/webcastDataConverter.js');
 const { deserializeMessage, deserializeWebsocketMessage } = require('./lib/webcastProtobuf.js');
@@ -73,6 +74,8 @@ class WebcastPushConnection extends EventEmitter {
     #isPollingEnabled;
     #isWsUpgradeDone;
 
+    #webcastDeserializer;
+
     /**
      * Create a new WebcastPushConnection instance
      * @param {string} uniqueId TikTok username (from URL)
@@ -104,6 +107,17 @@ class WebcastPushConnection extends EventEmitter {
             ...Config.DEFAULT_CLIENT_PARAMS,
             ...this.#options.clientParams,
         };
+
+        this.#webcastDeserializer = new WebcastDeserializer();
+        this.#webcastDeserializer.on('webcastResponse', (msg) => this.#processWebcastResponse(msg));
+        this.#webcastDeserializer.on('heartbeat', () => this.emit(ControlEvents.HEARTBEAT));
+        this.#webcastDeserializer.on('heartbeatDuration', (duration) => {
+            if (duration != this.#heartbeatDuration) {
+                this.#heartbeatDuration = duration;
+                this.emit(ControlEvents.HEARTBEAT_DURATION, duration);
+            }
+        });
+        this.#webcastDeserializer.on('messageDecodingFailed', (err) => this.#handleError(err, 'Websocket message decoding failed'));
 
         this.#setUnconnected();
     }
@@ -522,7 +536,7 @@ class WebcastPushConnection extends EventEmitter {
     }
 
     processRawData(msg) {
-        this.#websocket.feedRawData(msg);
+        this.#webcastDeserializer.process(msg);
     }
 
     #processWebcastResponse(webcastResponse) {

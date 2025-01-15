@@ -11,6 +11,7 @@ const {
 } = require('node:events');
 const TikTokHttpClient = require('./lib/tiktokHttpClient.js');
 const WebcastWebsocket = require('./lib/webcastWebsocket.js');
+const WebcastDeserializer = require('./lib/webcastDeserializer.js');
 const {
   getRoomIdFromMainPageHtml,
   validateAndNormalizeUniqueId,
@@ -83,6 +84,7 @@ var _isConnecting = /*#__PURE__*/new WeakMap();
 var _isConnected = /*#__PURE__*/new WeakMap();
 var _isPollingEnabled = /*#__PURE__*/new WeakMap();
 var _isWsUpgradeDone = /*#__PURE__*/new WeakMap();
+var _webcastDeserializer = /*#__PURE__*/new WeakMap();
 var _WebcastPushConnection_brand = /*#__PURE__*/new WeakSet();
 class WebcastPushConnection extends EventEmitter {
   /**
@@ -121,6 +123,7 @@ class WebcastPushConnection extends EventEmitter {
     _classPrivateFieldInitSpec(this, _isConnected, void 0);
     _classPrivateFieldInitSpec(this, _isPollingEnabled, void 0);
     _classPrivateFieldInitSpec(this, _isWsUpgradeDone, void 0);
+    _classPrivateFieldInitSpec(this, _webcastDeserializer, void 0);
     _assertClassBrand(_WebcastPushConnection_brand, this, _setOptions).call(this, options || {});
     _classPrivateFieldSet(_heartbeatDuration, this, 0);
     _classPrivateFieldSet(_uniqueStreamerId, this, validateAndNormalizeUniqueId(uniqueId));
@@ -129,6 +132,16 @@ class WebcastPushConnection extends EventEmitter {
       ...Config.DEFAULT_CLIENT_PARAMS,
       ..._classPrivateFieldGet(_options, this).clientParams
     });
+    _classPrivateFieldSet(_webcastDeserializer, this, new WebcastDeserializer());
+    _classPrivateFieldGet(_webcastDeserializer, this).on('webcastResponse', msg => _assertClassBrand(_WebcastPushConnection_brand, this, _processWebcastResponse).call(this, msg));
+    _classPrivateFieldGet(_webcastDeserializer, this).on('heartbeat', () => this.emit(ControlEvents.HEARTBEAT));
+    _classPrivateFieldGet(_webcastDeserializer, this).on('heartbeatDuration', duration => {
+      if (duration != _classPrivateFieldGet(_heartbeatDuration, this)) {
+        _classPrivateFieldSet(_heartbeatDuration, this, duration);
+        this.emit(ControlEvents.HEARTBEAT_DURATION, duration);
+      }
+    });
+    _classPrivateFieldGet(_webcastDeserializer, this).on('messageDecodingFailed', err => _assertClassBrand(_WebcastPushConnection_brand, this, _handleError).call(this, err, 'Websocket message decoding failed'));
     _assertClassBrand(_WebcastPushConnection_brand, this, _setUnconnected).call(this);
   }
   /**
@@ -354,7 +367,7 @@ class WebcastPushConnection extends EventEmitter {
     }
   }
   processRawData(msg) {
-    _classPrivateFieldGet(_websocket, this).feedRawData(msg);
+    _classPrivateFieldGet(_webcastDeserializer, this).process(msg);
   }
 }
 function _setOptions(providedOptions) {
