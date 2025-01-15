@@ -28,6 +28,7 @@ const ControlEvents = {
     WSCONNECTED: 'websocketConnected',
     HEARTBEAT: 'heartbeat',
     HEARTBEAT_DURATION: 'heartbeatDuration',
+    RAWRAWDATA: 'rawRawData',
 };
 
 const MessageEvents = {
@@ -503,6 +504,7 @@ class WebcastPushConnection extends EventEmitter {
                 });
             });
 
+            this.#websocket.on('rawRawData', (msg) => this.emit(ControlEvents.RAWRAWDATA, msg));
             this.#websocket.on('connectFailed', (err) => reject(`Websocket connection failed, ${err}`));
             this.#websocket.on('webcastResponse', (msg) => this.#processWebcastResponse(msg));
             this.#websocket.on('heartbeat', () => this.emit(ControlEvents.HEARTBEAT));
@@ -517,6 +519,10 @@ class WebcastPushConnection extends EventEmitter {
             // Hard timeout if the WebSocketClient library does not handle connect errors correctly.
             setTimeout(() => reject('Websocket not responding'), 30000);
         });
+    }
+
+    processRawData(msg) {
+        this.#websocket.feedRawData(msg);
     }
 
     #processWebcastResponse(webcastResponse) {

@@ -18,6 +18,10 @@ class WebcastWebsocket extends websocket.client {
         this.connect(this.wsUrlWithParams, '', Config.TIKTOK_URL_WEB, this.wsHeaders, websocketOptions);
     }
 
+    feedRawData(msg) {
+        this.#handleMessage({ binaryData: msg }, true);
+    }
+
     #handleEvents() {
         this.on('connect', (wsConnection) => {
             this.connection = wsConnection;
@@ -35,7 +39,8 @@ class WebcastWebsocket extends websocket.client {
         });
     }
 
-    async #handleMessage(message) {
+    async #handleMessage(message, isFedManally = false) {
+        if (!isFedManally) this.emit('rawRawData', message.binaryData);
         try {
             let decodedContainer = await deserializeWebsocketMessage(message.binaryData);
 
