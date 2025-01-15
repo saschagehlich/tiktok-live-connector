@@ -43,8 +43,15 @@ class WebcastWebsocket extends websocket.client {
                 this.#sendAck(decodedContainer.id);
             }
 
+            if (decodedContainer.type === 'hb') {
+                this.emit('heartbeat');
+            }
+
             // Emit 'WebcastResponse' from ws message container if decoding success
             if (typeof decodedContainer.webcastResponse === 'object') {
+                if (decodedContainer.webcastResponse.heartbeatDuration) {
+                    this.emit('heartbeatDuration', decodedContainer.webcastResponse.heartbeatDuration);
+                }
                 this.emit('webcastResponse', decodedContainer.webcastResponse);
             }
         } catch (err) {

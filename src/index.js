@@ -26,6 +26,8 @@ const ControlEvents = {
     DECODEDDATA: 'decodedData',
     STREAMEND: 'streamEnd',
     WSCONNECTED: 'websocketConnected',
+    HEARTBEAT: 'heartbeat',
+    HEARTBEAT_DURATION: 'heartbeatDuration',
 };
 
 const MessageEvents = {
@@ -60,7 +62,7 @@ class WebcastPushConnection extends EventEmitter {
     #clientParams;
     #httpClient;
     #availableGifts;
-
+    #heartbeatDuration;
     // Websocket
     #websocket;
 
@@ -93,6 +95,7 @@ class WebcastPushConnection extends EventEmitter {
 
         this.#setOptions(options || {});
 
+        this.#heartbeatDuration = 0;
         this.#uniqueStreamerId = validateAndNormalizeUniqueId(uniqueId);
         this.#httpClient = new TikTokHttpClient(this.#options.requestHeaders, this.#options.requestOptions, this.#options.signProviderOptions, this.#options.sessionId);
 
@@ -502,6 +505,13 @@ class WebcastPushConnection extends EventEmitter {
 
             this.#websocket.on('connectFailed', (err) => reject(`Websocket connection failed, ${err}`));
             this.#websocket.on('webcastResponse', (msg) => this.#processWebcastResponse(msg));
+            this.#websocket.on('heartbeat', () => this.emit(ControlEvents.HEARTBEAT));
+            this.#websocket.on('heartbeatDuration', (duration) => {
+                if (duration != this.#heartbeatDuration) {
+                    this.#heartbeatDuration = duration;
+                    this.emit(ControlEvents.HEARTBEAT_DURATION, duration);
+                }
+            });
             this.#websocket.on('messageDecodingFailed', (err) => this.#handleError(err, 'Websocket message decoding failed'));
 
             // Hard timeout if the WebSocketClient library does not handle connect errors correctly.
