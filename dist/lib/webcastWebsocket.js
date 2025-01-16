@@ -32,7 +32,10 @@ class WebcastWebsocket extends websocket.client {
       ...(customHeaders || {})
     };
     _classPrivateFieldSet(_webcastDeserializer, this, new WebcastDeserializer());
-    _classPrivateFieldGet(_webcastDeserializer, this).on('*', (event, msg) => this.emit(event, msg));
+    _classPrivateFieldGet(_webcastDeserializer, this).on('webcastResponse', msg => this.emit('webcastResponse', msg));
+    _classPrivateFieldGet(_webcastDeserializer, this).on('heartbeat', () => this.emit('heartbeat'));
+    _classPrivateFieldGet(_webcastDeserializer, this).on('heartbeatDuration', duration => this.emit('heartbeatDuration', duration));
+    _classPrivateFieldGet(_webcastDeserializer, this).on('messageDecodingFailed', err => this.emit('messageDecodingFailed', err));
     _classPrivateFieldGet(_webcastDeserializer, this).on('ack', id => _assertClassBrand(_WebcastWebsocket_brand, this, _sendAck).call(this, id));
     _assertClassBrand(_WebcastWebsocket_brand, this, _handleEvents).call(this);
     this.connect(this.wsUrlWithParams, '', Config.TIKTOK_URL_WEB, this.wsHeaders, websocketOptions);
