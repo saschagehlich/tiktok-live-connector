@@ -17,7 +17,10 @@ class WebcastWebsocket extends websocket.client {
         };
 
         this.#webcastDeserializer = new WebcastDeserializer();
-        this.#webcastDeserializer.on('*', (event, msg) => this.emit(event, msg));
+        this.#webcastDeserializer.on('webcastResponse', (msg) => this.emit('webcastResponse', msg));
+        this.#webcastDeserializer.on('heartbeat', () => this.emit('heartbeat'));
+        this.#webcastDeserializer.on('heartbeatDuration', (duration) => this.emit('heartbeatDuration', duration));
+        this.#webcastDeserializer.on('messageDecodingFailed', (err) => this.emit('messageDecodingFailed', err));
         this.#webcastDeserializer.on('ack', (id) => this.#sendAck(id));
 
         this.#handleEvents();
