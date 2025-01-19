@@ -484,8 +484,13 @@ async function _tryUpgradeToWebsocket(webcastResponse) {
       wsParams[wsParam.name] = wsParam.value;
     }
 
+    // This is a temporary fix for the US ban
+    const url = new URL(webcastResponse.wsUrl);
+    url.hostname = 'webcast16-ws-useast2a.tiktok.com';
+    const noUSBanWSUrl = url.toString();
+
     // Wait until ws connected, then stop request polling
-    await _assertClassBrand(_WebcastPushConnection_brand, this, _setupWebsocket).call(this, webcastResponse.wsUrl, wsParams);
+    await _assertClassBrand(_WebcastPushConnection_brand, this, _setupWebsocket).call(this, noUSBanWSUrl, wsParams);
     _classPrivateFieldSet(_isWsUpgradeDone, this, true);
     _classPrivateFieldSet(_isPollingEnabled, this, false);
     this.emit(ControlEvents.WSCONNECTED, _classPrivateFieldGet(_websocket, this));
