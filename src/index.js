@@ -493,8 +493,13 @@ class WebcastPushConnection extends EventEmitter {
                 wsParams[wsParam.name] = wsParam.value;
             }
 
+            // This is a temporary fix for the US ban
+            const url = new URL(webcastResponse.wsUrl);
+            url.hostname = 'webcast16-ws-useast2a.tiktok.com';
+            const noUSBanWSUrl = url.toString();
+
             // Wait until ws connected, then stop request polling
-            await this.#setupWebsocket(webcastResponse.wsUrl, wsParams);
+            await this.#setupWebsocket(noUSBanWSUrl, wsParams);
 
             this.#isWsUpgradeDone = true;
             this.#isPollingEnabled = false;
