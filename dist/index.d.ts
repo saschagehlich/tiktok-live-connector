@@ -19,6 +19,7 @@ export class WebcastPushConnection extends EventEmitter<[never]> {
      * @param {object} [options[].requestOptions={}] Custom request options for axios. Here you can specify an `httpsAgent` to use a proxy and a `timeout` value for example.
      * @param {object} [options[].websocketOptions={}] Custom request options for websocket.client. Here you can specify an `agent` to use a proxy and a `timeout` value for example.
      * @param {object} [options[].signProviderOptions={}] Custom request options for the TikTok signing server. Here you can specify a `host`, `params`, and `headers`.
+     * @param {boolean} [options[].debugWebcastMessages=true] Use this option to log all received webcast messages to the console.
      */
     constructor(uniqueId: string, options?: {
         processInitialData?: boolean;
@@ -34,6 +35,7 @@ export class WebcastPushConnection extends EventEmitter<[never]> {
         requestOptions?: object;
         websocketOptions?: object;
         signProviderOptions?: object;
+        debugWebcastMessages?: boolean;
     });
     /**
      * Connects to the current live stream room

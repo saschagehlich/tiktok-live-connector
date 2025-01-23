@@ -104,7 +104,9 @@ class WebcastPushConnection extends EventEmitter {
    * @param {object} [options[].requestOptions={}] Custom request options for axios. Here you can specify an `httpsAgent` to use a proxy and a `timeout` value for example.
    * @param {object} [options[].websocketOptions={}] Custom request options for websocket.client. Here you can specify an `agent` to use a proxy and a `timeout` value for example.
    * @param {object} [options[].signProviderOptions={}] Custom request options for the TikTok signing server. Here you can specify a `host`, `params`, and `headers`.
+   * @param {boolean} [options[].debugWebcastMessages=true] Use this option to log all received webcast messages to the console.
    */
+
   constructor(uniqueId, options) {
     super();
     _classPrivateMethodInitSpec(this, _WebcastPushConnection_brand);
@@ -527,6 +529,9 @@ async function _setupWebsocket(wsUrl, wsParams) {
 function _processWebcastResponse(webcastResponse) {
   // Emit raw (protobuf encoded) data for a use case specific processing
   webcastResponse.messages.forEach(message => {
+    if (_classPrivateFieldGet(_options, this).debugWebcastMessages) {
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] ' + message.type, message.binary);
+    }
     this.emit(ControlEvents.RAWDATA, message.type, message.binary);
   });
 
