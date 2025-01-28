@@ -24,7 +24,7 @@ class WebcastWebsocket extends websocket.client {
         this.#webcastDeserializer.on('ack', (id) => this.#sendAck(id));
 
         this.#handleEvents();
-        this.connect(this.wsUrlWithParams, '', Config.TIKTOK_URL_WEB, this.wsHeaders, websocketOptions);
+        this.connect(this.wsUrlWithParams + '&version_code=180800', '', Config.TIKTOK_URL_WEB, this.wsHeaders, websocketOptions);
     }
 
     feedRawData(msg) {

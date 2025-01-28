@@ -38,7 +38,7 @@ class WebcastWebsocket extends websocket.client {
     _classPrivateFieldGet(_webcastDeserializer, this).on('messageDecodingFailed', err => this.emit('messageDecodingFailed', err));
     _classPrivateFieldGet(_webcastDeserializer, this).on('ack', id => _assertClassBrand(_WebcastWebsocket_brand, this, _sendAck).call(this, id));
     _assertClassBrand(_WebcastWebsocket_brand, this, _handleEvents).call(this);
-    this.connect(this.wsUrlWithParams, '', Config.TIKTOK_URL_WEB, this.wsHeaders, websocketOptions);
+    this.connect(this.wsUrlWithParams + '&version_code=180800', '', Config.TIKTOK_URL_WEB, this.wsHeaders, websocketOptions);
   }
   feedRawData(msg) {
     _assertClassBrand(_WebcastWebsocket_brand, this, _handleMessage).call(this, {
