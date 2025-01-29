@@ -38,6 +38,7 @@ class TikTokHttpClient {
     if (sessionId) {
       this.setSessionId(sessionId);
     }
+    this.cookieJar.setCookie('tt-target-idc', 'useast2a');
   }
   setSessionId(sessionId) {
     this.cookieJar.setCookie('sessionid', sessionId);
