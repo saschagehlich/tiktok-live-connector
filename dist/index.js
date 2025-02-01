@@ -539,6 +539,9 @@ function _processWebcastResponse(webcastResponse) {
   webcastResponse.messages.filter(x => x.decodedData).forEach(message => {
     var _simplifiedObj$displa, _simplifiedObj$displa2;
     let simplifiedObj = simplifyObject(message.decodedData);
+    if (!_classPrivateFieldGet(_options, this).processInitialData && new Date().getTime() - simplifiedObj.createTime > 10000) {
+      return;
+    }
     this.emit(ControlEvents.DECODEDDATA, message.type, simplifiedObj, message.binary);
     switch (message.type) {
       case 'WebcastControlMessage':
