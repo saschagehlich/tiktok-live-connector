@@ -561,10 +561,6 @@ class WebcastPushConnection extends EventEmitter {
             .forEach((message) => {
                 let simplifiedObj = simplifyObject(message.decodedData);
 
-                if (!this.#options.processInitialData && new Date().getTime() - simplifiedObj.createTime > 10000) {
-                    return;
-                }
-
                 this.emit(ControlEvents.DECODEDDATA, message.type, simplifiedObj, message.binary);
 
                 switch (message.type) {
