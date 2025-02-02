@@ -76,6 +76,7 @@ export class WebcastPushConnection extends EventEmitter<[never]> {
      */
     decodeProtobufMessage(messageType: string, messageBuffer: Buffer): Promise<void>;
     processRawData(msg: any): void;
+    get roomId(): any;
     #private;
 }
 import { EventEmitter } from "events";

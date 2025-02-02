@@ -373,6 +373,9 @@ class WebcastPushConnection extends EventEmitter {
   processRawData(msg) {
     _classPrivateFieldGet(_webcastDeserializer, this).process(msg);
   }
+  get roomId() {
+    return _classPrivateFieldGet(_roomId, this);
+  }
 }
 function _setOptions(providedOptions) {
   _classPrivateFieldSet(_options, this, Object.assign({

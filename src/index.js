@@ -636,6 +636,10 @@ class WebcastPushConnection extends EventEmitter {
             this.emit(ControlEvents.ERROR, { info, exception });
         }
     }
+
+    get roomId() {
+        return this.#roomId;
+    }
 }
 
 module.exports = {
