@@ -187,16 +187,6 @@ class WebcastPushConnection extends EventEmitter {
                 await this.#retrieveRoomId();
             }
 
-            // Fetch room info if option enabled
-            if (this.#options.fetchRoomInfoOnConnect) {
-                await this.#fetchRoomInfo();
-
-                // Prevent connections to finished rooms
-                if (this.#roomInfo.status === 4) {
-                    throw new UserOfflineError('LIVE has ended');
-                }
-            }
-
             // Fetch all available gift info if option enabled
             if (this.#options.enableExtendedGiftInfo) {
                 await this.#fetchAvailableGifts();
@@ -409,6 +399,9 @@ class WebcastPushConnection extends EventEmitter {
                 this.#roomId = roomId;
                 this.#clientParams.room_id = roomId;
             } catch (err) {
+                if (err instanceof UserOfflineError) {
+                    throw err;
+                }
                 // Use fallback method
                 let roomData = await this.#httpClient.getJsonObjectFromTiktokApi('api-live/user/room/', {
                     ...this.#clientParams,

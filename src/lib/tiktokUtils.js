@@ -2,6 +2,15 @@ const { UserOfflineError, InvalidUniqueIdError } = require('./tiktokErrors');
 let uu = [];
 
 function getRoomIdFromMainPageHtml(mainPageHtml) {
+    let matchScript = mainPageHtml.match(/<script id="SIGI_STATE" type="application\/json">(.*?)<\/script>/s);
+    if (matchScript && matchScript[1]) {
+        let json = JSON.parse(matchScript[1]);
+        const status = json.LiveRoom.liveRoomUserInfo.user.status;
+        if (status === 4) {
+            throw new UserOfflineError('LIVE has ended');
+        }
+    }
+
     let idx = 0;
     do {
         // loop thru many "room" excerpts and look for a match

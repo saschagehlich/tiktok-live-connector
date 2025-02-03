@@ -173,16 +173,6 @@ class WebcastPushConnection extends EventEmitter {
         await _assertClassBrand(_WebcastPushConnection_brand, this, _retrieveRoomId).call(this);
       }
 
-      // Fetch room info if option enabled
-      if (_classPrivateFieldGet(_options, this).fetchRoomInfoOnConnect) {
-        await _assertClassBrand(_WebcastPushConnection_brand, this, _fetchRoomInfo).call(this);
-
-        // Prevent connections to finished rooms
-        if (_classPrivateFieldGet(_roomInfo, this).status === 4) {
-          throw new UserOfflineError('LIVE has ended');
-        }
-      }
-
       // Fetch all available gift info if option enabled
       if (_classPrivateFieldGet(_options, this).enableExtendedGiftInfo) {
         await _assertClassBrand(_WebcastPushConnection_brand, this, _fetchAvailableGifts).call(this);
@@ -414,6 +404,9 @@ async function _retrieveRoomId() {
       _classPrivateFieldSet(_roomId, this, roomId);
       _classPrivateFieldGet(_clientParams, this).room_id = roomId;
     } catch (err) {
+      if (err instanceof UserOfflineError) {
+        throw err;
+      }
       // Use fallback method
       let roomData = await _classPrivateFieldGet(_httpClient, this).getJsonObjectFromTiktokApi('api-live/user/room/', {
         ..._classPrivateFieldGet(_clientParams, this),
