@@ -166,6 +166,7 @@ class WebcastPushConnection extends EventEmitter {
     try {
       // roomId already specified?
       if (roomId) {
+        console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] already got room id', roomId);
         _classPrivateFieldSet(_roomId, this, roomId);
         _classPrivateFieldGet(_clientParams, this).room_id = roomId;
       } else {
@@ -409,6 +410,7 @@ async function _retrieveRoomId() {
     let mainPageHtml = await _classPrivateFieldGet(_httpClient, this).getMainPage(`@${_classPrivateFieldGet(_uniqueStreamerId, this)}/live`);
     try {
       let roomId = getRoomIdFromMainPageHtml(mainPageHtml);
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] got room id from html', roomId);
       _classPrivateFieldSet(_roomId, this, roomId);
       _classPrivateFieldGet(_clientParams, this).room_id = roomId;
     } catch (err) {
@@ -419,6 +421,7 @@ async function _retrieveRoomId() {
         sourceType: 54
       });
       if (roomData.statusCode) throw new InvalidResponseError(`API Error ${roomData.statusCode} (${roomData.message || 'Unknown Error'})`, undefined);
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] got room id from api', roomData.data.user.roomId);
       _classPrivateFieldSet(_roomId, this, roomData.data.user.roomId);
       _classPrivateFieldGet(_clientParams, this).room_id = roomData.data.user.roomId;
     }

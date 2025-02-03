@@ -180,6 +180,7 @@ class WebcastPushConnection extends EventEmitter {
         try {
             // roomId already specified?
             if (roomId) {
+                console.log('[' + this.#uniqueStreamerId + '] already got room id', roomId);
                 this.#roomId = roomId;
                 this.#clientParams.room_id = roomId;
             } else {
@@ -403,6 +404,8 @@ class WebcastPushConnection extends EventEmitter {
             try {
                 let roomId = getRoomIdFromMainPageHtml(mainPageHtml);
 
+                console.log('[' + this.#uniqueStreamerId + '] got room id from html', roomId);
+
                 this.#roomId = roomId;
                 this.#clientParams.room_id = roomId;
             } catch (err) {
@@ -414,6 +417,8 @@ class WebcastPushConnection extends EventEmitter {
                 });
 
                 if (roomData.statusCode) throw new InvalidResponseError(`API Error ${roomData.statusCode} (${roomData.message || 'Unknown Error'})`, undefined);
+
+                console.log('[' + this.#uniqueStreamerId + '] got room id from api', roomData.data.user.roomId);
 
                 this.#roomId = roomData.data.user.roomId;
                 this.#clientParams.room_id = roomData.data.user.roomId;
