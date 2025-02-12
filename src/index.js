@@ -7,8 +7,6 @@ const { getRoomIdFromMainPageHtml, validateAndNormalizeUniqueId, addUniqueId, re
 const { simplifyObject } = require('./lib/webcastDataConverter.js');
 const { deserializeMessage, deserializeWebsocketMessage } = require('./lib/webcastProtobuf.js');
 
-const sleepAsync = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
 const Config = require('./lib/webcastConfig.js');
 const {
     AlreadyConnectingError,
@@ -231,8 +229,6 @@ class WebcastPushConnection extends EventEmitter {
             this.#isConnected = true;
 
             let state = this.getState();
-
-            await sleepAsync(3000);
 
             this.emit(ControlEvents.CONNECTED, state);
             return state;
