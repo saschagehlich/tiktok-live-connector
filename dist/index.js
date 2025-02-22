@@ -161,6 +161,7 @@ class WebcastPushConnection extends EventEmitter {
     _classPrivateFieldSet(_isConnecting, this, true);
 
     // add streamerId to uu
+    console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] adding streamerId to uu');
     addUniqueId(_classPrivateFieldGet(_uniqueStreamerId, this));
     try {
       // roomId already specified?
@@ -169,14 +170,17 @@ class WebcastPushConnection extends EventEmitter {
         _classPrivateFieldSet(_roomId, this, roomId);
         _classPrivateFieldGet(_clientParams, this).room_id = roomId;
       } else {
+        console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] retrieving room id');
         await _assertClassBrand(_WebcastPushConnection_brand, this, _retrieveRoomId).call(this);
       }
 
       // Fetch all available gift info if option enabled
       if (_classPrivateFieldGet(_options, this).enableExtendedGiftInfo) {
+        console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] fetching available gifts');
         await _assertClassBrand(_WebcastPushConnection_brand, this, _fetchAvailableGifts).call(this);
       }
       try {
+        console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] fetching room data');
         await _assertClassBrand(_WebcastPushConnection_brand, this, _fetchRoomData).call(this, true);
       } catch (ex) {
         var _jsonError;
@@ -193,6 +197,7 @@ class WebcastPushConnection extends EventEmitter {
         const errorMessage = ((_jsonError = jsonError) === null || _jsonError === void 0 ? void 0 : _jsonError.error) || 'Failed to retrieve the initial room data.';
         throw new InitialFetchError(errorMessage, retryAfter);
       }
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] no upgrade to WebSocket is offered by TikTok');
 
       // Sometimes no upgrade to WebSocket is offered by TikTok
       // In that case we use request polling (if enabled and possible)
@@ -209,17 +214,21 @@ class WebcastPushConnection extends EventEmitter {
         }
         _assertClassBrand(_WebcastPushConnection_brand, this, _startFetchRoomPolling).call(this);
       }
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] connected');
       _classPrivateFieldSet(_isConnected, this, true);
       let state = this.getState();
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] emitting connected event');
       this.emit(ControlEvents.CONNECTED, state);
       return state;
     } catch (err) {
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] error while connecting');
       _assertClassBrand(_WebcastPushConnection_brand, this, _handleError).call(this, err, 'Error while connecting');
 
       // remove streamerId from uu on connect fail
       removeUniqueId(_classPrivateFieldGet(_uniqueStreamerId, this));
       throw err;
     } finally {
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] setting isConnecting to false');
       _classPrivateFieldSet(_isConnecting, this, false);
     }
   }
