@@ -173,6 +173,7 @@ class WebcastPushConnection extends EventEmitter {
         this.#isConnecting = true;
 
         // add streamerId to uu
+        console.log('[' + this.#uniqueStreamerId + '] adding streamerId to uu');
         addUniqueId(this.#uniqueStreamerId);
 
         try {
@@ -182,15 +183,18 @@ class WebcastPushConnection extends EventEmitter {
                 this.#roomId = roomId;
                 this.#clientParams.room_id = roomId;
             } else {
+                console.log('[' + this.#uniqueStreamerId + '] retrieving room id');
                 await this.#retrieveRoomId();
             }
 
             // Fetch all available gift info if option enabled
             if (this.#options.enableExtendedGiftInfo) {
+                console.log('[' + this.#uniqueStreamerId + '] fetching available gifts');
                 await this.#fetchAvailableGifts();
             }
 
             try {
+                console.log('[' + this.#uniqueStreamerId + '] fetching room data');
                 await this.#fetchRoomData(true);
             } catch (ex) {
                 let jsonError;
@@ -207,6 +211,8 @@ class WebcastPushConnection extends EventEmitter {
                 const errorMessage = jsonError?.error || 'Failed to retrieve the initial room data.';
                 throw new InitialFetchError(errorMessage, retryAfter);
             }
+
+            console.log('[' + this.#uniqueStreamerId + '] no upgrade to WebSocket is offered by TikTok');
 
             // Sometimes no upgrade to WebSocket is offered by TikTok
             // In that case we use request polling (if enabled and possible)
@@ -226,13 +232,15 @@ class WebcastPushConnection extends EventEmitter {
                 this.#startFetchRoomPolling();
             }
 
+            console.log('[' + this.#uniqueStreamerId + '] connected');
             this.#isConnected = true;
 
             let state = this.getState();
-
+            console.log('[' + this.#uniqueStreamerId + '] emitting connected event');
             this.emit(ControlEvents.CONNECTED, state);
             return state;
         } catch (err) {
+            console.log('[' + this.#uniqueStreamerId + '] error while connecting');
             this.#handleError(err, 'Error while connecting');
 
             // remove streamerId from uu on connect fail
@@ -240,6 +248,7 @@ class WebcastPushConnection extends EventEmitter {
 
             throw err;
         } finally {
+            console.log('[' + this.#uniqueStreamerId + '] setting isConnecting to false');
             this.#isConnecting = false;
         }
     }
