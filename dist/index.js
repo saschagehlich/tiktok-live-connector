@@ -19,7 +19,8 @@ const {
   removeUniqueId
 } = require('./lib/tiktokUtils.js');
 const {
-  simplifyObject
+  simplifyObject,
+  getUserAttributes
 } = require('./lib/webcastDataConverter.js');
 const {
   deserializeMessage,
@@ -61,7 +62,8 @@ const MessageEvents = {
   LIVEINTRO: 'liveIntro',
   EMOTE: 'emote',
   ENVELOPE: 'envelope',
-  SUBSCRIBE: 'subscribe'
+  SUBSCRIBE: 'subscribe',
+  GIFTED_SUB: 'giftedSub'
 };
 const CustomEvents = {
   FOLLOW: 'follow',
@@ -369,7 +371,7 @@ class WebcastPushConnection extends EventEmitter {
     }
   }
   processRawData(msg) {
-    _classPrivateFieldGet(_webcastDeserializer, this).process(msg);
+    return _classPrivateFieldGet(_webcastDeserializer, this).process(msg);
   }
   get roomId() {
     return _classPrivateFieldGet(_roomId, this);
@@ -609,6 +611,14 @@ function _processWebcastResponse(webcastResponse) {
         break;
       case 'WebcastSubNotifyMessage':
         this.emit(MessageEvents.SUBSCRIBE, simplifiedObj);
+        break;
+      case 'WebcastBarrageMessage':
+        if (simplifiedObj.msgType === 100) {
+          this.emit(MessageEvents.GIFTED_SUB, {
+            sendingUser: getUserAttributes(message.decodedData.content.pieces[1].userValue.user),
+            receivingUser: getUserAttributes(message.decodedData.content.pieces[0].userValue.user)
+          });
+        }
         break;
     }
   });

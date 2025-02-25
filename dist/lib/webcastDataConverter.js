@@ -217,5 +217,6 @@ function getPreferredPictureFormat(pictureUrls) {
   return pictureUrls.find(x => x.includes('100x100') && x.includes('.webp')) || pictureUrls.find(x => x.includes('100x100') && x.includes('.jpeg')) || pictureUrls.find(x => !x.includes('shrink')) || pictureUrls[0];
 }
 module.exports = {
-  simplifyObject
+  simplifyObject,
+  getUserAttributes
 };

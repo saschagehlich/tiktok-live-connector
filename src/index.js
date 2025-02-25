@@ -4,7 +4,7 @@ const TikTokHttpClient = require('./lib/tiktokHttpClient.js');
 const WebcastWebsocket = require('./lib/webcastWebsocket.js');
 const WebcastDeserializer = require('./lib/webcastDeserializer.js');
 const { getRoomIdFromMainPageHtml, validateAndNormalizeUniqueId, addUniqueId, removeUniqueId } = require('./lib/tiktokUtils.js');
-const { simplifyObject } = require('./lib/webcastDataConverter.js');
+const { simplifyObject, getUserAttributes } = require('./lib/webcastDataConverter.js');
 const { deserializeMessage, deserializeWebsocketMessage } = require('./lib/webcastProtobuf.js');
 
 const Config = require('./lib/webcastConfig.js');
@@ -46,6 +46,7 @@ const MessageEvents = {
     EMOTE: 'emote',
     ENVELOPE: 'envelope',
     SUBSCRIBE: 'subscribe',
+    GIFTED_SUB: 'giftedSub',
 };
 
 const CustomEvents = {
@@ -550,7 +551,7 @@ class WebcastPushConnection extends EventEmitter {
     }
 
     processRawData(msg) {
-        this.#webcastDeserializer.process(msg);
+        return this.#webcastDeserializer.process(msg);
     }
 
     #processWebcastResponse(webcastResponse) {
@@ -629,6 +630,14 @@ class WebcastPushConnection extends EventEmitter {
                         break;
                     case 'WebcastSubNotifyMessage':
                         this.emit(MessageEvents.SUBSCRIBE, simplifiedObj);
+                        break;
+                    case 'WebcastBarrageMessage':
+                        if (simplifiedObj.msgType === 100) {
+                            this.emit(MessageEvents.GIFTED_SUB, {
+                                sendingUser: getUserAttributes(message.decodedData.content.pieces[1].userValue.user),
+                                receivingUser: getUserAttributes(message.decodedData.content.pieces[0].userValue.user),
+                            });
+                        }
                         break;
                 }
             });

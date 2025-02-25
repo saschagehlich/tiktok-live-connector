@@ -48,6 +48,7 @@ function deserializeMessage(protoName, binaryMessage) {
                 case 'WebcastEmoteChatMessage':
                 case 'WebcastEnvelopeMessage':
                 case 'WebcastSubNotifyMessage':
+                case 'WebcastBarrageMessage':
                     message.decodedData = tiktokSchema.lookupType(`TikTok.${message.type}`).decode(message.binary);
                     break;
             }

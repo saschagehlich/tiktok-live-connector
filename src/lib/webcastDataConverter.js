@@ -244,4 +244,5 @@ function getPreferredPictureFormat(pictureUrls) {
 
 module.exports = {
     simplifyObject,
+    getUserAttributes,
 };

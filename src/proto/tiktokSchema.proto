@@ -13,11 +13,16 @@ message WebcastResponse {
   int32 heartbeatDuration = 8;
   bool needAck = 9;
   string wsUrl = 10;
+  bool historyNoMore = 13;
 }
 
 message Message {
   string type = 1;
   bytes binary = 2;
+  int64 msgId = 3;
+  int32 msgType = 4;
+  int64 offset = 5;
+  bool isHistory = 6;
 }
 
 message WebsocketParam {
@@ -95,6 +100,28 @@ message WebcastGiftMessageGiftImage {
   string giftPictureUrl = 1;
 }
 
+message WebcastBarrageMessage {
+  WebcastMessageEvent event = 1;
+  int32 msgType = 3;
+  Text content = 5;
+}
+
+message Text {
+  string key = 1;
+  string defaultPattern = 2;
+  repeated TextPiece pieces = 4;
+} 
+
+message TextPiece {
+  int32 type = 1;
+  string stringValue = 11;
+  TextPieceUser userValue = 21;
+}
+
+message TextPieceUser {
+    User user = 1;
+    bool withColon = 2;
+}
 
 // Battle start
 message WebcastLinkMicBattle {
