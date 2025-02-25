@@ -615,8 +615,8 @@ function _processWebcastResponse(webcastResponse) {
       case 'WebcastBarrageMessage':
         if (simplifiedObj.msgType === 100) {
           this.emit(MessageEvents.GIFTED_SUB, {
-            sendingUser: getUserAttributes(message.decodedData.content.pieces[1].userValue.user),
-            receivingUser: getUserAttributes(message.decodedData.content.pieces[0].userValue.user)
+            ...getUserAttributes(message.decodedData.content.pieces[0].userValue.user),
+            sender: getUserAttributes(message.decodedData.content.pieces[1].userValue.user)
           });
         }
         break;
