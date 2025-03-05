@@ -407,6 +407,9 @@ class WebcastPushConnection extends EventEmitter {
             } catch (err) {
                 if (err instanceof UserOfflineError) {
                     throw err;
+                } else {
+                    console.log('[' + this.#uniqueStreamerId + '] error while reading room id from html');
+                    console.error(err);
                 }
                 // Use fallback method
                 let roomData = await this.#httpClient.getJsonObjectFromTiktokApi('api-live/user/room/', {

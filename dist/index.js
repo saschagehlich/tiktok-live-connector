@@ -415,6 +415,9 @@ async function _retrieveRoomId() {
     } catch (err) {
       if (err instanceof UserOfflineError) {
         throw err;
+      } else {
+        console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] error while reading room id from html');
+        console.error(err);
       }
       // Use fallback method
       let roomData = await _classPrivateFieldGet(_httpClient, this).getJsonObjectFromTiktokApi('api-live/user/room/', {
