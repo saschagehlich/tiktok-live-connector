@@ -420,6 +420,10 @@ class WebcastPushConnection extends EventEmitter {
 
                 if (roomData.statusCode) throw new InvalidResponseError(`API Error ${roomData.statusCode} (${roomData.message || 'Unknown Error'})`, undefined);
 
+                if (roomData.data.liveRoom.status !== 2) {
+                    throw new UserOfflineError('LIVE has ended');
+                }
+
                 console.log('[' + this.#uniqueStreamerId + '] got room id from api', roomData.data.user.roomId);
 
                 this.#roomId = roomData.data.user.roomId;

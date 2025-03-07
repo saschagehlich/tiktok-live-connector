@@ -408,6 +408,7 @@ async function _retrieveRoomId() {
   try {
     let mainPageHtml = await _classPrivateFieldGet(_httpClient, this).getMainPage(`@${_classPrivateFieldGet(_uniqueStreamerId, this)}/live`);
     try {
+      throw new Error('foo');
       let roomId = getRoomIdFromMainPageHtml(mainPageHtml);
       console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] got room id from html', roomId);
       _classPrivateFieldSet(_roomId, this, roomId);
@@ -426,6 +427,9 @@ async function _retrieveRoomId() {
         sourceType: 54
       });
       if (roomData.statusCode) throw new InvalidResponseError(`API Error ${roomData.statusCode} (${roomData.message || 'Unknown Error'})`, undefined);
+      if (roomData.data.liveRoom.status !== 2) {
+        throw new UserOfflineError('LIVE has ended');
+      }
       console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] got room id from api', roomData.data.user.roomId);
       _classPrivateFieldSet(_roomId, this, roomData.data.user.roomId);
       _classPrivateFieldGet(_clientParams, this).room_id = roomData.data.user.roomId;
