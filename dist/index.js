@@ -408,7 +408,6 @@ async function _retrieveRoomId() {
   try {
     let mainPageHtml = await _classPrivateFieldGet(_httpClient, this).getMainPage(`@${_classPrivateFieldGet(_uniqueStreamerId, this)}/live`);
     try {
-      throw new Error('foo');
       let roomId = getRoomIdFromMainPageHtml(mainPageHtml);
       console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] got room id from html', roomId);
       _classPrivateFieldSet(_roomId, this, roomId);
