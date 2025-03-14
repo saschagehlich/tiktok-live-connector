@@ -397,6 +397,8 @@ class WebcastPushConnection extends EventEmitter {
         try {
             let mainPageHtml = await this.#httpClient.getMainPage(`@${this.#uniqueStreamerId}/live`);
 
+            console.log('[' + this.#uniqueStreamerId + '] mainPageHtml length', mainPageHtml.length);
+
             try {
                 let roomId = getRoomIdFromMainPageHtml(mainPageHtml);
 
@@ -411,12 +413,17 @@ class WebcastPushConnection extends EventEmitter {
                     console.log('[' + this.#uniqueStreamerId + '] error while reading room id from html');
                     console.error(err);
                 }
+
+                console.log('[' + this.#uniqueStreamerId + '] using fallback method');
+
                 // Use fallback method
                 let roomData = await this.#httpClient.getJsonObjectFromTiktokApi('api-live/user/room/', {
                     ...this.#clientParams,
                     uniqueId: this.#uniqueStreamerId,
                     sourceType: 54,
                 });
+
+                console.log('[' + this.#uniqueStreamerId + '] roomData', roomData);
 
                 if (roomData.statusCode) throw new InvalidResponseError(`API Error ${roomData.statusCode} (${roomData.message || 'Unknown Error'})`, undefined);
 

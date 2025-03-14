@@ -407,6 +407,7 @@ function _setUnconnected() {
 async function _retrieveRoomId() {
   try {
     let mainPageHtml = await _classPrivateFieldGet(_httpClient, this).getMainPage(`@${_classPrivateFieldGet(_uniqueStreamerId, this)}/live`);
+    console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] mainPageHtml length', mainPageHtml.length);
     try {
       let roomId = getRoomIdFromMainPageHtml(mainPageHtml);
       console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] got room id from html', roomId);
@@ -419,12 +420,15 @@ async function _retrieveRoomId() {
         console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] error while reading room id from html');
         console.error(err);
       }
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] using fallback method');
+
       // Use fallback method
       let roomData = await _classPrivateFieldGet(_httpClient, this).getJsonObjectFromTiktokApi('api-live/user/room/', {
         ..._classPrivateFieldGet(_clientParams, this),
         uniqueId: _classPrivateFieldGet(_uniqueStreamerId, this),
         sourceType: 54
       });
+      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] roomData', roomData);
       if (roomData.statusCode) throw new InvalidResponseError(`API Error ${roomData.statusCode} (${roomData.message || 'Unknown Error'})`, undefined);
       if (roomData.data.liveRoom.status !== 2) {
         throw new UserOfflineError('LIVE has ended');
