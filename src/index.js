@@ -213,11 +213,11 @@ class WebcastPushConnection extends EventEmitter {
                 throw new InitialFetchError(errorMessage, retryAfter);
             }
 
-            console.log('[' + this.#uniqueStreamerId + '] no upgrade to WebSocket is offered by TikTok');
-
             // Sometimes no upgrade to WebSocket is offered by TikTok
             // In that case we use request polling (if enabled and possible)
             if (!this.#isWsUpgradeDone) {
+                console.log('[' + this.#uniqueStreamerId + '] no upgrade to WebSocket is offered by TikTok');
+
                 if (!this.#options.enableRequestPolling) {
                     throw new NoWSUpgradeError('TikTok does not offer a websocket upgrade and request polling is disabled (`enableRequestPolling` option).');
                 }
