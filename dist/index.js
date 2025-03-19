@@ -263,7 +263,8 @@ class WebcastPushConnection extends EventEmitter {
       upgradedToWebsocket: _classPrivateFieldGet(_isWsUpgradeDone, this),
       roomId: _classPrivateFieldGet(_roomId, this),
       roomInfo: _classPrivateFieldGet(_roomInfo, this),
-      availableGifts: _classPrivateFieldGet(_availableGifts, this)
+      availableGifts: _classPrivateFieldGet(_availableGifts, this),
+      pollingEnabled: _classPrivateFieldGet(_isPollingEnabled, this)
     };
   }
 

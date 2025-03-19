@@ -284,6 +284,7 @@ class WebcastPushConnection extends EventEmitter {
             roomId: this.#roomId,
             roomInfo: this.#roomInfo,
             availableGifts: this.#availableGifts,
+            pollingEnabled: this.#isPollingEnabled,
         };
     }
 
