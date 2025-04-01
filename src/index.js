@@ -6,7 +6,7 @@ const WebcastDeserializer = require('./lib/webcastDeserializer.js');
 const { getRoomIdFromMainPageHtml, validateAndNormalizeUniqueId, addUniqueId, removeUniqueId } = require('./lib/tiktokUtils.js');
 const { simplifyObject, getUserAttributes } = require('./lib/webcastDataConverter.js');
 const { deserializeMessage, deserializeWebsocketMessage } = require('./lib/webcastProtobuf.js');
-
+const { isAxiosError } = require('axios');
 const Config = require('./lib/webcastConfig.js');
 const {
     AlreadyConnectingError,
@@ -209,6 +209,13 @@ class WebcastPushConnection extends EventEmitter {
                 }
 
                 if (!jsonError) throw ex;
+
+                if (isAxiosError(ex)) {
+                    console.log(ex.request.host, ex.request.path, ex.request.method);
+                    console.log(ex.response.headers);
+                    console.log(ex.response.status);
+                    console.log(ex.response.data);
+                }
                 const errorMessage = jsonError?.error || 'Failed to retrieve the initial room data.';
                 throw new InitialFetchError(errorMessage, retryAfter);
             }

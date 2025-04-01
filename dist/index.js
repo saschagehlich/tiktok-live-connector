@@ -26,6 +26,9 @@ const {
   deserializeMessage,
   deserializeWebsocketMessage
 } = require('./lib/webcastProtobuf.js');
+const {
+  isAxiosError
+} = require('axios');
 const Config = require('./lib/webcastConfig.js');
 const {
   AlreadyConnectingError,
@@ -196,14 +199,20 @@ class WebcastPushConnection extends EventEmitter {
           throw ex;
         }
         if (!jsonError) throw ex;
+        if (isAxiosError(ex)) {
+          console.log(ex.request.host, ex.request.path, ex.request.method);
+          console.log(ex.response.headers);
+          console.log(ex.response.status);
+          console.log(ex.response.data);
+        }
         const errorMessage = ((_jsonError = jsonError) === null || _jsonError === void 0 ? void 0 : _jsonError.error) || 'Failed to retrieve the initial room data.';
         throw new InitialFetchError(errorMessage, retryAfter);
       }
-      console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] no upgrade to WebSocket is offered by TikTok');
 
       // Sometimes no upgrade to WebSocket is offered by TikTok
       // In that case we use request polling (if enabled and possible)
       if (!_classPrivateFieldGet(_isWsUpgradeDone, this)) {
+        console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] no upgrade to WebSocket is offered by TikTok');
         if (!_classPrivateFieldGet(_options, this).enableRequestPolling) {
           throw new NoWSUpgradeError('TikTok does not offer a websocket upgrade and request polling is disabled (`enableRequestPolling` option).');
         }
