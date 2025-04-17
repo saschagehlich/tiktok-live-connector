@@ -30,11 +30,17 @@ async function fetchWebcastResponse(params, signProviderOptions) {
     ...(signProviderOptions === null || signProviderOptions === void 0 ? void 0 : signProviderOptions.params)
   };
   fullParams.uuc = getUuc();
+  console.log(config.signProviderHost + 'webcast/fetch', {
+    params: fullParams,
+    headers: signProviderOptions === null || signProviderOptions === void 0 ? void 0 : signProviderOptions.headers,
+    responseType: 'arraybuffer'
+  });
   let response = await axios.get(config.signProviderHost + 'webcast/fetch', {
     params: fullParams,
     headers: signProviderOptions === null || signProviderOptions === void 0 ? void 0 : signProviderOptions.headers,
     responseType: 'arraybuffer'
   });
+  console.log(response.headers);
   return response;
 }
 function signWebcastRequest(url, headers, cookieJar, signProviderOptions) {
