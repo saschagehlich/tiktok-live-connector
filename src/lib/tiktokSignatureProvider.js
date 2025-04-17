@@ -27,10 +27,8 @@ async function fetchWebcastResponse(params, signProviderOptions) {
 
     fullParams.uuc = getUuc();
 
-    console.log(config.signProviderHost + 'webcast/fetch', { params: fullParams, headers: signProviderOptions?.headers, responseType: 'arraybuffer' });
     let response = await axios.get(config.signProviderHost + 'webcast/fetch', { params: fullParams, headers: signProviderOptions?.headers, responseType: 'arraybuffer' });
 
-    console.log(response.headers);
     return response;
 }
 
