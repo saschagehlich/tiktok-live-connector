@@ -484,7 +484,7 @@ class WebcastPushConnection extends EventEmitter {
     }
 
     async #fetchRoomData(isInitial) {
-        let webcastResponse = await this.#httpClient.getDeserializedObjectFromWebcastApi('im/fetch/', this.#clientParams, 'WebcastResponse', isInitial);
+        let webcastResponse = await this.#httpClient.getDeserializedObjectFromWebcastApi(this.#clientParams, 'WebcastResponse', isInitial);
         let upgradeToWsOffered = !!webcastResponse.wsUrl;
 
         if (!webcastResponse.cursor) {
@@ -525,19 +525,15 @@ class WebcastPushConnection extends EventEmitter {
                 wsParams[wsParam.name] = wsParam.value;
             }
 
-            // This is a temporary fix for the US ban
-            const url = new URL(webcastResponse.wsUrl);
-            url.hostname = 'webcast16-ws-useast2a.tiktok.com';
-            const noUSBanWSUrl = url.toString();
-
             // Wait until ws connected, then stop request polling
-            await this.#setupWebsocket(noUSBanWSUrl, wsParams);
+            await this.#setupWebsocket(webcastResponse.wsUrl, wsParams);
 
             this.#isWsUpgradeDone = true;
             this.#isPollingEnabled = false;
 
             this.emit(ControlEvents.WSCONNECTED, this.#websocket);
         } catch (err) {
+            console.log(err);
             this.#handleError(err, 'Upgrade to websocket failed');
         }
     }
@@ -545,7 +541,6 @@ class WebcastPushConnection extends EventEmitter {
     async #setupWebsocket(wsUrl, wsParams) {
         return new Promise((resolve, reject) => {
             this.#websocket = new WebcastWebsocket(wsUrl, this.#httpClient.cookieJar, this.#clientParams, wsParams, this.#options.websocketHeaders, this.#options.websocketOptions);
-
             this.#websocket.on('connect', (wsConnection) => {
                 resolve();
 

@@ -12,11 +12,24 @@ const axios = require('axios').create({
 let config = {
     enabled: true,
     signProviderHost: 'https://tiktok.eulerstream.com/',
-    signProviderFallbackHosts: ['https://tiktok-sign.zerody.one/'],
     extraParams: {},
 };
 
 let signEvents = new EventEmitter();
+
+async function fetchWebcastResponse(params, signProviderOptions) {
+    let fullParams = {
+        ...params,
+        client: 'ttlive-node',
+        ...config.extraParams,
+        ...signProviderOptions?.params,
+    };
+
+    fullParams.uuc = getUuc();
+
+    let response = await axios.get(config.signProviderHost + 'webcast/fetch', { params: fullParams, headers: signProviderOptions?.headers, responseType: 'arraybuffer' });
+    return response;
+}
 
 function signWebcastRequest(url, headers, cookieJar, signProviderOptions) {
     return signRequest('webcast/sign_url', url, headers, cookieJar, signProviderOptions);
@@ -36,29 +49,15 @@ async function signRequest(providerPath, url, headers, cookieJar, signProviderOp
 
     params.uuc = getUuc();
 
-    let hostsToTry = [config.signProviderHost, ...config.signProviderFallbackHosts];
-    // Prioritize the custom host if provided
-    if (signProviderOptions?.host) {
-        // Remove any existing entries of the custom host to avoid duplication
-        hostsToTry = hostsToTry.filter((host) => host !== signProviderOptions.host);
-        hostsToTry.unshift(signProviderOptions.host);
-    }
-
     let signHost;
-    let signResponse;
     let signError;
+    let signResponse;
 
     try {
-        for (signHost of hostsToTry) {
-            try {
-                signResponse = await axios.get(signHost + providerPath, { params, headers: signProviderOptions?.headers, responseType: 'json' });
-
-                if (signResponse.status === 200 && typeof signResponse.data === 'object') {
-                    break;
-                }
-            } catch (err) {
-                signError = err;
-            }
+        try {
+            signResponse = await axios.get(config.signProviderHost + providerPath, { params, headers: signProviderOptions?.headers, responseType: 'json' });
+        } catch (err) {
+            signError = err;
         }
 
         if (!signResponse) {
@@ -112,4 +111,5 @@ module.exports = {
     config,
     signEvents,
     signWebcastRequest,
+    fetchWebcastResponse,
 };

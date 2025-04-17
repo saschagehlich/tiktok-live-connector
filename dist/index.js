@@ -480,7 +480,7 @@ async function _startFetchRoomPolling() {
   }
 }
 async function _fetchRoomData(isInitial) {
-  let webcastResponse = await _classPrivateFieldGet(_httpClient, this).getDeserializedObjectFromWebcastApi('im/fetch/', _classPrivateFieldGet(_clientParams, this), 'WebcastResponse', isInitial);
+  let webcastResponse = await _classPrivateFieldGet(_httpClient, this).getDeserializedObjectFromWebcastApi(_classPrivateFieldGet(_clientParams, this), 'WebcastResponse', isInitial);
   let upgradeToWsOffered = !!webcastResponse.wsUrl;
   if (!webcastResponse.cursor) {
     if (isInitial) {
@@ -516,17 +516,13 @@ async function _tryUpgradeToWebsocket(webcastResponse) {
       wsParams[wsParam.name] = wsParam.value;
     }
 
-    // This is a temporary fix for the US ban
-    const url = new URL(webcastResponse.wsUrl);
-    url.hostname = 'webcast16-ws-useast2a.tiktok.com';
-    const noUSBanWSUrl = url.toString();
-
     // Wait until ws connected, then stop request polling
-    await _assertClassBrand(_WebcastPushConnection_brand, this, _setupWebsocket).call(this, noUSBanWSUrl, wsParams);
+    await _assertClassBrand(_WebcastPushConnection_brand, this, _setupWebsocket).call(this, webcastResponse.wsUrl, wsParams);
     _classPrivateFieldSet(_isWsUpgradeDone, this, true);
     _classPrivateFieldSet(_isPollingEnabled, this, false);
     this.emit(ControlEvents.WSCONNECTED, _classPrivateFieldGet(_websocket, this));
   } catch (err) {
+    console.log(err);
     _assertClassBrand(_WebcastPushConnection_brand, this, _handleError).call(this, err, 'Upgrade to websocket failed');
   }
 }

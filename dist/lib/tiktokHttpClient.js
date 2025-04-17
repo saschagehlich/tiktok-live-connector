@@ -9,7 +9,8 @@ const {
   deserializeMessage
 } = require('./webcastProtobuf.js');
 const {
-  signWebcastRequest
+  signWebcastRequest,
+  fetchWebcastResponse
 } = require('./tiktokSignatureProvider');
 const Config = require('./webcastConfig.js');
 var _TikTokHttpClient_brand = /*#__PURE__*/new WeakSet();
@@ -49,9 +50,11 @@ class TikTokHttpClient {
     let response = await _assertClassBrand(_TikTokHttpClient_brand, this, _get).call(this, `${Config.TIKTOK_URL_WEB}${path}`);
     return response.data;
   }
-  async getDeserializedObjectFromWebcastApi(path, params, schemaName, shouldSign) {
-    let url = await _assertClassBrand(_TikTokHttpClient_brand, this, _buildUrl).call(this, Config.TIKTOK_URL_WEBCAST, path, params, shouldSign);
-    let response = await _assertClassBrand(_TikTokHttpClient_brand, this, _get).call(this, url, 'arraybuffer');
+  async getDeserializedObjectFromWebcastApi(params, schemaName) {
+    let response = await fetchWebcastResponse(params, this.signProviderOptions);
+    if (response.headers['x-set-tt-cookie']) {
+      this.cookieJar.processSetCookieHeader(response.headers['x-set-tt-cookie']);
+    }
     return deserializeMessage(schemaName, response.data);
   }
   async getJsonObjectFromWebcastApi(path, params, shouldSign) {
@@ -83,7 +86,7 @@ function _post(url, params, data, responseType) {
 async function _buildUrl(host, path, params, sign) {
   let fullUrl = `${host}${path}?${new URLSearchParams(params || {})}`;
   if (sign) {
-    fullUrl = await signWebcastRequest(fullUrl, this.axiosInstance.defaults.headers, this.cookieJar, this.signProviderOptions);
+    fullUrl = await signWebcastRequest(params, this.axiosInstance.defaults.headers, this.cookieJar, this.signProviderOptions);
   }
   return fullUrl;
 }
