@@ -561,6 +561,7 @@ class WebcastPushConnection extends EventEmitter {
                 }
             });
             this.#websocket.on('messageDecodingFailed', (err) => this.#handleError(err, 'Websocket message decoding failed'));
+            this.#websocket.on('error', (err) => this.#handleError(err, 'Websocket error'));
 
             // Hard timeout if the WebSocketClient library does not handle connect errors correctly.
             setTimeout(() => reject('Websocket not responding'), 30000);

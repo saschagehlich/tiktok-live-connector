@@ -7,9 +7,15 @@ class WebcastDeserializer extends EventEmitter {
     }
 
     async process(msg) {
+        let decodedContainer;
         try {
-            let decodedContainer = await deserializeWebsocketMessage(msg);
+            decodedContainer = await deserializeWebsocketMessage(msg);
+        } catch (err) {
+            this.emit('messageDecodingFailed', err);
+            return;
+        }
 
+        try {
             if (decodedContainer.id > 0) {
                 this.emit('ack', decodedContainer.id);
             }
@@ -26,7 +32,7 @@ class WebcastDeserializer extends EventEmitter {
                 this.emit('webcastResponse', decodedContainer.webcastResponse);
             }
         } catch (err) {
-            this.emit('messageDecodingFailed', err);
+            this.emit('error', err);
         }
     }
 }

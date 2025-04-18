@@ -22,6 +22,7 @@ class WebcastWebsocket extends websocket.client {
         this.#webcastDeserializer.on('heartbeatDuration', (duration) => this.emit('heartbeatDuration', duration));
         this.#webcastDeserializer.on('messageDecodingFailed', (err) => this.emit('messageDecodingFailed', err));
         this.#webcastDeserializer.on('ack', (id) => this.#sendAck(id));
+        this.#webcastDeserializer.on('error', (err) => this.emit('error', err));
 
         this.#handleEvents();
         this.connect(this.wsUrlWithParams + '&version_code=180800', '', Config.TIKTOK_URL_WEB, this.wsHeaders, websocketOptions);

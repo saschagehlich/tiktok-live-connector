@@ -547,6 +547,7 @@ async function _setupWebsocket(wsUrl, wsParams) {
       }
     });
     _classPrivateFieldGet(_websocket, this).on('messageDecodingFailed', err => _assertClassBrand(_WebcastPushConnection_brand, this, _handleError).call(this, err, 'Websocket message decoding failed'));
+    _classPrivateFieldGet(_websocket, this).on('error', err => _assertClassBrand(_WebcastPushConnection_brand, this, _handleError).call(this, err, 'Websocket error'));
 
     // Hard timeout if the WebSocketClient library does not handle connect errors correctly.
     setTimeout(() => reject('Websocket not responding'), 30000);
