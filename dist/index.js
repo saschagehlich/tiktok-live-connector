@@ -448,6 +448,8 @@ async function _retrieveRoomId() {
       _classPrivateFieldGet(_clientParams, this).room_id = roomData.data.user.roomId;
     }
   } catch (err) {
+    console.log('[' + _classPrivateFieldGet(_uniqueStreamerId, this) + '] error while retrieving room id');
+    console.error(err);
     throw new ExtractRoomIdError(`Failed to retrieve room_id from page source. ${err.message}`);
   }
 }

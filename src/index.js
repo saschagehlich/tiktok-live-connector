@@ -445,6 +445,8 @@ class WebcastPushConnection extends EventEmitter {
                 this.#clientParams.room_id = roomData.data.user.roomId;
             }
         } catch (err) {
+            console.log('[' + this.#uniqueStreamerId + '] error while retrieving room id');
+            console.error(err)
             throw new ExtractRoomIdError(`Failed to retrieve room_id from page source. ${err.message}`);
         }
     }
